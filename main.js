@@ -5,14 +5,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1a2e);
 
-// Camera setup - BUG 1: Camera positioned incorrectly (too close, can't see objects)
+// Camera setup
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
 );
-camera.position.z = 0.5; // BUG: Should be around 5-10 to see the scene properly
+camera.position.z = 8;
 
 // Renderer setup
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -23,22 +23,20 @@ document.getElementById('canvas-container').appendChild(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-// Lighting - BUG 2: Missing ambient light, scene is too dark
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+// Lighting
+const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(5, 5, 5);
 scene.add(directionalLight);
-// Missing: scene.add(new THREE.AmbientLight(0x404040, 0.5));
 
 // Create cubes
 const cubes = [];
 const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
 
 for (let i = 0; i < 5; i++) {
-    // BUG 3: Using wrong material property (color should be in material constructor)
     const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshStandardMaterial();
-    material.color = colors[i]; // BUG: Should be { color: colors[i] } in constructor
-
+    const material = new THREE.MeshStandardMaterial({ color: colors[i] });
     const cube = new THREE.Mesh(geometry, material);
 
     // Position cubes in a circle
@@ -50,9 +48,9 @@ for (let i = 0; i < 5; i++) {
     cubes.push(cube);
 }
 
-// Animation loop - BUG 4: Missing requestAnimationFrame, animation won't work
+// Animation loop
 function animate() {
-    // BUG: Missing requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
 
     // Rotate cubes
     cubes.forEach((cube, index) => {
